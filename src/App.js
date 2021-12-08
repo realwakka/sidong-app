@@ -7,7 +7,7 @@ function App() {
     const [text, setText] = useState('');
     
     const getData = async () => {
-	const data = await API.get('pythonapi', '/hello')
+	const data = await API.get('post', '/post')
 	setText(data)
 	console.log(data)
     }
