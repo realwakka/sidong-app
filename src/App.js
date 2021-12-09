@@ -1,39 +1,71 @@
 import logo from './logo.svg';
 import './App.css';
 import { API } from 'aws-amplify';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-function App() {
+function AddPost() {
   const [text, setText] = useState('');
 
-  const addPost = async (text) => {
-    const params = {
-      headers: {},
-      response: true,
-      queryStringParameters: {
+  const addPost = async (content) => {
+    console.log('posting ' + content);
+    const result = await API.post('post', '/post', {
+      body: {
 	name: 'unknown',
-	content: text,
-      },
-    };
-    const result = await API.post('post', '/post', params);
+	content: content
+      }
+    });
     console.log(result);
+    window.location.reload();    
   }
+  
+  const onClickSubmit = (e) => {
+    console.log('onClick!');
+    addPost(text);
+    setText('');
 
-  const getPost = async () => {
-    const result = await API.get('post', '/post');
-    setText(result.message);
-  }
+  };
 
-  // addPost('sample');
-  getPost();
+  const onChange = (e) => {
+    setText(e.target.value);
+  };
+  
+  return (
+      <div className="AddPost">
+      <input value={text} type="text" onChange={onChange}/>
+      <button onClick={onClickSubmit}>
+      submit!
+      </button>
+      </div>
+  );
+}
+
+function Post(props) {
+  return (
+      <p> {props.name} : {props.content} </p>
+  );
+}
+
+
+function App() {
+  const [postList, setPostList] = useState([]);
+
+  useEffect(() => {
+    const getPosts = async () => {
+      const res = await API.get('post', '/post');
+      console.log(res);
+      const list = res.data.Items.map(
+	(post) => <Post key={post.id.S} name={post.name.S} content={post.content.S} />);
+      setPostList(list);
+    };
+    getPosts();
+  }, []);
+  
   return (
       <div className="App">
       <header className="App-header">
       <img src={logo} className="App-logo" alt="logo" />
-      <p>
-      {text}
-    </p>
-      <input type="text" />
+      {postList}
+    <AddPost/>
       </header>
       </div>
   );
