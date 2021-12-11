@@ -8,6 +8,10 @@ export const onCreatePost = /* GraphQL */ `
       name
       content
       created
+      comments {
+        nextToken
+      }
+      type
       createdAt
       updatedAt
     }
@@ -20,6 +24,10 @@ export const onUpdatePost = /* GraphQL */ `
       name
       content
       created
+      comments {
+        nextToken
+      }
+      type
       createdAt
       updatedAt
     }
@@ -32,6 +40,10 @@ export const onDeletePost = /* GraphQL */ `
       name
       content
       created
+      comments {
+        nextToken
+      }
+      type
       createdAt
       updatedAt
     }
@@ -43,17 +55,20 @@ export const onCreateComment = /* GraphQL */ `
       id
       name
       content
+      created
+      postId
       post {
         id
         name
         content
         created
+        type
         createdAt
         updatedAt
       }
-      created
       createdAt
       updatedAt
+      postCommentsId
     }
   }
 `;
@@ -63,17 +78,20 @@ export const onUpdateComment = /* GraphQL */ `
       id
       name
       content
+      created
+      postId
       post {
         id
         name
         content
         created
+        type
         createdAt
         updatedAt
       }
-      created
       createdAt
       updatedAt
+      postCommentsId
     }
   }
 `;
@@ -83,17 +101,20 @@ export const onDeleteComment = /* GraphQL */ `
       id
       name
       content
+      created
+      postId
       post {
         id
         name
         content
         created
+        type
         createdAt
         updatedAt
       }
-      created
       createdAt
       updatedAt
+      postCommentsId
     }
   }
 `;

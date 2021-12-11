@@ -1,7 +1,7 @@
 import './App.css';
 import { API, graphqlOperation } from 'aws-amplify';
 import React, { useState, useEffect } from 'react';
-import { listPosts, listComments } from './graphql/queries'
+import { listPosts, listComments, postByName, postByTypeAndCreated, commentByPostAndCreated } from './graphql/queries'
 import { createPost, createComment } from './graphql/mutations'
 
 function AddPost() {
@@ -12,7 +12,8 @@ function AddPost() {
 	const result = await API.graphql(graphqlOperation(createPost, {input: {
 	    name: 'unknown',
 	    content: content,
-	    created: new Date().toISOString()
+	    created: new Date().toISOString(),
+	    type: 'post'
 	}}));
 	console.log(result);
 	window.location.reload();    
@@ -41,9 +42,9 @@ function AddPost() {
 
 function Post(props) {
     return (
-	<div className="Post">
+	    <div border="1px solid black" className="Post">
 	    <p> {props.name} : {props.content} </p>
-	    <Comment postId={props.id}/>
+	    <Comment key={props.id} postId={props.id}/>
 	    </div>
     );
 }
@@ -52,14 +53,15 @@ function AddComment(props) {
     const [text, setText] = useState('');
     const addComment = async (content) => {
 	console.log('commenting ' + content + props.postId);
+	
 	const result = await API.graphql(graphqlOperation(createComment, {input: {
 	    name: 'unknown',
 	    content: content,
+	    postId: props.postId,
 	    created: new Date().toISOString(),
-	    post: {id: props.postId}
 	}}));
 	console.log(result);
-	window.location.reload();    
+	window.location.reload();
     }
     
     const onClickSubmit = (e) => {
@@ -77,7 +79,7 @@ function AddComment(props) {
 	    <div className="AddComment">
 	    <input value={text} type="text" onChange={onChange}/>
 	    <button onClick={onClickSubmit}>
-	    submit!
+	    comment!
 	</button>
 	    </div>
     );
@@ -87,22 +89,29 @@ function AddComment(props) {
 function Comment(props) {
     const [commentList, setCommentList] = useState([]);
     
-    const getComments = async () => {
-	const res = await API.graphql(graphqlOperation(listComments))
-	console.log(res);	    
-	const comments = res.data.listComments.items
-	const list = comments.map(
-	    (comment) => <p> {comment.content} </p>);
-	setCommentList(list);
-    };
-
     useEffect(() => {
+	const getComments = async () => {
+	    console.log('get comment post id : ' + props.postId);
+	    const res = await API.graphql({query:commentByPostAndCreated, variables: {
+		postId: props.postId,
+		created: {lt: new Date().toISOString()},
+		sortDirection: 'DESC'
+	    }});
+	    
+	    console.log(res);
+	    const comments = res.data.commentByPostAndCreated.items
+	    const list = comments.map(
+		(comment) => <p> {comment.content} </p>);
+	    setCommentList(list);
+	};
+	
 	getComments();
     }, []);
     
     return (
 	    <div className="Comment">
-	    <AddComment postId={props.postId}/>
+	    <AddComment key={props.postId} postId={props.postId}/>
+	    {commentList}
 	    </div>
     );
 }
@@ -114,9 +123,14 @@ function App() {
     useEffect(() => {
 	const getPosts = async () => {
 	    //const res = await API.get('post', '/post');
-	    const res = await API.graphql(graphqlOperation(listPosts))
+	    // const res = await API.graphql({query:listPosts, variables: {filter:{}}});
+	    const res = await API.graphql({query:postByTypeAndCreated, variables: {
+		type: 'post',
+		created: {lt: new Date().toISOString()},
+		sortDirection: 'DESC'
+	    }});	    
 	    console.log(res);	    
-	    const posts = res.data.listPosts.items
+	    const posts = res.data.postByTypeAndCreated.items
 	    const list = posts.map(
 		(post) => <Post key={post.id} id={post.id} name={post.name} content={post.content} />);
 	    setPostList(list);

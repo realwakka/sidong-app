@@ -11,6 +11,10 @@ export const createPost = /* GraphQL */ `
       name
       content
       created
+      comments {
+        nextToken
+      }
+      type
       createdAt
       updatedAt
     }
@@ -26,6 +30,10 @@ export const updatePost = /* GraphQL */ `
       name
       content
       created
+      comments {
+        nextToken
+      }
+      type
       createdAt
       updatedAt
     }
@@ -41,6 +49,10 @@ export const deletePost = /* GraphQL */ `
       name
       content
       created
+      comments {
+        nextToken
+      }
+      type
       createdAt
       updatedAt
     }
@@ -55,17 +67,20 @@ export const createComment = /* GraphQL */ `
       id
       name
       content
+      created
+      postId
       post {
         id
         name
         content
         created
+        type
         createdAt
         updatedAt
       }
-      created
       createdAt
       updatedAt
+      postCommentsId
     }
   }
 `;
@@ -78,17 +93,20 @@ export const updateComment = /* GraphQL */ `
       id
       name
       content
+      created
+      postId
       post {
         id
         name
         content
         created
+        type
         createdAt
         updatedAt
       }
-      created
       createdAt
       updatedAt
+      postCommentsId
     }
   }
 `;
@@ -101,17 +119,20 @@ export const deleteComment = /* GraphQL */ `
       id
       name
       content
+      created
+      postId
       post {
         id
         name
         content
         created
+        type
         createdAt
         updatedAt
       }
-      created
       createdAt
       updatedAt
+      postCommentsId
     }
   }
 `;
