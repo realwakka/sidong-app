@@ -1,10 +1,10 @@
 import './App.css';
 import { API, graphqlOperation } from 'aws-amplify';
 import React, { useState, useEffect } from 'react';
-import { listPosts, listComments, postByName, postByTypeAndCreated, commentByPostAndCreated } from './graphql/queries'
+import { listPosts, listComments, postByName, postByBoardAndCreated, commentByPostAndCreated } from './graphql/queries'
 import { createPost, createComment } from './graphql/mutations'
 
-function AddPost() {
+function AddPost(props) {
     const [text, setText] = useState('');
 
     const addPost = async (content) => {
@@ -13,7 +13,8 @@ function AddPost() {
 	    name: 'unknown',
 	    content: content,
 	    created: new Date().toISOString(),
-	    type: 'post'
+	  type: 'post',
+	  boardId: props.boardId
 	}}));
 	console.log(result);
 	window.location.reload();    
@@ -96,7 +97,6 @@ function AddComment(props) {
 
 function Comment(props) {
   const [commentList, setCommentList] = useState([]);
-
     
     useEffect(() => {
 	const getComments = async () => {
@@ -126,33 +126,45 @@ function Comment(props) {
     );
 }
 
+function Board(props) {
+  const [postList, setPostList] = useState([]);
+
+  useEffect(() => {
+    const getPosts = async () => {
+      const res = await API.graphql({query:postByBoardAndCreated, variables: {
+	boardId: props.id,
+	created: {lt: new Date().toISOString()},
+	sortDirection: 'DESC'
+      }});	    
+      console.log(res);	    
+      const posts = res.data.postByTypeAndCreated.items
+      const list = posts.map(
+	(post) => <Post key={post.id} id={post.id} name={post.name} content={post.content} />);
+      setPostList(list);
+    };
+    getPosts();
+  }, []);
+  
+  return (
+      <div className="App">
+      <AddPost boardId={props.id}/>	  
+      {postList}
+    </div>
+  );
+}
+
+function BoardList(props) {
+  return (<div></div>);
+}
 
 function App() {
-    const [postList, setPostList] = useState([]);
-
-    useEffect(() => {
-	const getPosts = async () => {
-	    //const res = await API.get('post', '/post');
-	    // const res = await API.graphql({query:listPosts, variables: {filter:{}}});
-	    const res = await API.graphql({query:postByTypeAndCreated, variables: {
-		type: 'post',
-		created: {lt: new Date().toISOString()},
-		sortDirection: 'DESC'
-	    }});	    
-	    console.log(res);	    
-	    const posts = res.data.postByTypeAndCreated.items
-	    const list = posts.map(
-		(post) => <Post key={post.id} id={post.id} name={post.name} content={post.content} />);
-	    setPostList(list);
-	};
-	getPosts();
-    }, []);
-    
-    return (
-	    <div className="App">
-	    <AddPost/>	  
-	    {postList}
-	    </div>
+  const [boardId, setBoardId] = useState('');
+  
+  return (
+      <div className="App">
+      <BoardList />
+      <Board id={boardId}/>
+      </div>
     );
 }
 

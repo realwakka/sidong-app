@@ -1,6 +1,57 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const createBoard = /* GraphQL */ `
+  mutation CreateBoard(
+    $input: CreateBoardInput!
+    $condition: ModelBoardConditionInput
+  ) {
+    createBoard(input: $input, condition: $condition) {
+      id
+      name
+      created
+      posts {
+        nextToken
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const updateBoard = /* GraphQL */ `
+  mutation UpdateBoard(
+    $input: UpdateBoardInput!
+    $condition: ModelBoardConditionInput
+  ) {
+    updateBoard(input: $input, condition: $condition) {
+      id
+      name
+      created
+      posts {
+        nextToken
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const deleteBoard = /* GraphQL */ `
+  mutation DeleteBoard(
+    $input: DeleteBoardInput!
+    $condition: ModelBoardConditionInput
+  ) {
+    deleteBoard(input: $input, condition: $condition) {
+      id
+      name
+      created
+      posts {
+        nextToken
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;
 export const createPost = /* GraphQL */ `
   mutation CreatePost(
     $input: CreatePostInput!
@@ -14,9 +65,17 @@ export const createPost = /* GraphQL */ `
       comments {
         nextToken
       }
-      type
+      boardId
+      board {
+        id
+        name
+        created
+        createdAt
+        updatedAt
+      }
       createdAt
       updatedAt
+      boardPostsId
     }
   }
 `;
@@ -33,9 +92,17 @@ export const updatePost = /* GraphQL */ `
       comments {
         nextToken
       }
-      type
+      boardId
+      board {
+        id
+        name
+        created
+        createdAt
+        updatedAt
+      }
       createdAt
       updatedAt
+      boardPostsId
     }
   }
 `;
@@ -52,9 +119,17 @@ export const deletePost = /* GraphQL */ `
       comments {
         nextToken
       }
-      type
+      boardId
+      board {
+        id
+        name
+        created
+        createdAt
+        updatedAt
+      }
       createdAt
       updatedAt
+      boardPostsId
     }
   }
 `;
@@ -74,9 +149,10 @@ export const createComment = /* GraphQL */ `
         name
         content
         created
-        type
+        boardId
         createdAt
         updatedAt
+        boardPostsId
       }
       createdAt
       updatedAt
@@ -100,9 +176,10 @@ export const updateComment = /* GraphQL */ `
         name
         content
         created
-        type
+        boardId
         createdAt
         updatedAt
+        boardPostsId
       }
       createdAt
       updatedAt
@@ -126,9 +203,10 @@ export const deleteComment = /* GraphQL */ `
         name
         content
         created
-        type
+        boardId
         createdAt
         updatedAt
+        boardPostsId
       }
       createdAt
       updatedAt

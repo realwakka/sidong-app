@@ -1,6 +1,38 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const getBoard = /* GraphQL */ `
+  query GetBoard($id: ID!) {
+    getBoard(id: $id) {
+      id
+      name
+      created
+      posts {
+        nextToken
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const listBoards = /* GraphQL */ `
+  query ListBoards(
+    $filter: ModelBoardFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listBoards(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        name
+        created
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+  }
+`;
 export const getPost = /* GraphQL */ `
   query GetPost($id: ID!) {
     getPost(id: $id) {
@@ -11,9 +43,17 @@ export const getPost = /* GraphQL */ `
       comments {
         nextToken
       }
-      type
+      boardId
+      board {
+        id
+        name
+        created
+        createdAt
+        updatedAt
+      }
       createdAt
       updatedAt
+      boardPostsId
     }
   }
 `;
@@ -29,9 +69,10 @@ export const listPosts = /* GraphQL */ `
         name
         content
         created
-        type
+        boardId
         createdAt
         updatedAt
+        boardPostsId
       }
       nextToken
     }
@@ -50,9 +91,10 @@ export const getComment = /* GraphQL */ `
         name
         content
         created
-        type
+        boardId
         createdAt
         updatedAt
+        boardPostsId
       }
       createdAt
       updatedAt
@@ -81,6 +123,32 @@ export const listComments = /* GraphQL */ `
     }
   }
 `;
+export const boardByName = /* GraphQL */ `
+  query BoardByName(
+    $name: String
+    $sortDirection: ModelSortDirection
+    $filter: ModelBoardFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    boardByName(
+      name: $name
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        name
+        created
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+  }
+`;
 export const postByName = /* GraphQL */ `
   query PostByName(
     $name: String
@@ -101,25 +169,26 @@ export const postByName = /* GraphQL */ `
         name
         content
         created
-        type
+        boardId
         createdAt
         updatedAt
+        boardPostsId
       }
       nextToken
     }
   }
 `;
-export const postByTypeAndCreated = /* GraphQL */ `
-  query PostByTypeAndCreated(
-    $type: String
+export const postByBoardAndCreated = /* GraphQL */ `
+  query PostByBoardAndCreated(
+    $boardId: ID
     $created: ModelStringKeyConditionInput
     $sortDirection: ModelSortDirection
     $filter: ModelPostFilterInput
     $limit: Int
     $nextToken: String
   ) {
-    postByTypeAndCreated(
-      type: $type
+    postByBoardAndCreated(
+      boardId: $boardId
       created: $created
       sortDirection: $sortDirection
       filter: $filter
@@ -131,9 +200,10 @@ export const postByTypeAndCreated = /* GraphQL */ `
         name
         content
         created
-        type
+        boardId
         createdAt
         updatedAt
+        boardPostsId
       }
       nextToken
     }

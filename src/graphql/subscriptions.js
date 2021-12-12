@@ -1,6 +1,48 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const onCreateBoard = /* GraphQL */ `
+  subscription OnCreateBoard {
+    onCreateBoard {
+      id
+      name
+      created
+      posts {
+        nextToken
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const onUpdateBoard = /* GraphQL */ `
+  subscription OnUpdateBoard {
+    onUpdateBoard {
+      id
+      name
+      created
+      posts {
+        nextToken
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const onDeleteBoard = /* GraphQL */ `
+  subscription OnDeleteBoard {
+    onDeleteBoard {
+      id
+      name
+      created
+      posts {
+        nextToken
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;
 export const onCreatePost = /* GraphQL */ `
   subscription OnCreatePost {
     onCreatePost {
@@ -11,9 +53,17 @@ export const onCreatePost = /* GraphQL */ `
       comments {
         nextToken
       }
-      type
+      boardId
+      board {
+        id
+        name
+        created
+        createdAt
+        updatedAt
+      }
       createdAt
       updatedAt
+      boardPostsId
     }
   }
 `;
@@ -27,9 +77,17 @@ export const onUpdatePost = /* GraphQL */ `
       comments {
         nextToken
       }
-      type
+      boardId
+      board {
+        id
+        name
+        created
+        createdAt
+        updatedAt
+      }
       createdAt
       updatedAt
+      boardPostsId
     }
   }
 `;
@@ -43,9 +101,17 @@ export const onDeletePost = /* GraphQL */ `
       comments {
         nextToken
       }
-      type
+      boardId
+      board {
+        id
+        name
+        created
+        createdAt
+        updatedAt
+      }
       createdAt
       updatedAt
+      boardPostsId
     }
   }
 `;
@@ -62,9 +128,10 @@ export const onCreateComment = /* GraphQL */ `
         name
         content
         created
-        type
+        boardId
         createdAt
         updatedAt
+        boardPostsId
       }
       createdAt
       updatedAt
@@ -85,9 +152,10 @@ export const onUpdateComment = /* GraphQL */ `
         name
         content
         created
-        type
+        boardId
         createdAt
         updatedAt
+        boardPostsId
       }
       createdAt
       updatedAt
@@ -108,9 +176,10 @@ export const onDeleteComment = /* GraphQL */ `
         name
         content
         created
-        type
+        boardId
         createdAt
         updatedAt
+        boardPostsId
       }
       createdAt
       updatedAt
