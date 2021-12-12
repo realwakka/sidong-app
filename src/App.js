@@ -41,10 +41,18 @@ function AddPost() {
 }
 
 function Post(props) {
+  const [commentVisible, setCommentVisible] = useState(false);
+  const toggleComment = (e) => {
+    setCommentVisible(!commentVisible);
+  };
+    
+  
     return (
 	    <div border="1px solid black" className="Post">
-	    <p> {props.name} : {props.content} </p>
-	    <Comment key={props.id} postId={props.id}/>
+	<p> {props.name} : {props.content} </p>
+	<button onClick={toggleComment}> toggle </button>	
+	{commentVisible &&
+	 <Comment key={props.id} postId={props.id}/>}
 	    </div>
     );
 }
@@ -87,7 +95,8 @@ function AddComment(props) {
 
 
 function Comment(props) {
-    const [commentList, setCommentList] = useState([]);
+  const [commentList, setCommentList] = useState([]);
+
     
     useEffect(() => {
 	const getComments = async () => {
@@ -107,12 +116,13 @@ function Comment(props) {
 	
 	getComments();
     }, []);
-    
+
     return (
-	    <div className="Comment">
-	    <AddComment key={props.postId} postId={props.postId}/>
-	    {commentList}
-	    </div>
+	<div className="Comment">
+
+	{commentList}
+	 <AddComment key={props.postId} postId={props.postId}/>
+      </div>
     );
 }
 
