@@ -1,44 +1,36 @@
 import './App.css';
 import { API, graphqlOperation } from 'aws-amplify';
 import React, { useState, useEffect } from 'react';
-import { listPosts, listComments, postByName, postByBoardAndCreated, commentByPostAndCreated } from './graphql/queries'
-import { createPost, createComment } from './graphql/mutations'
+import { postByBoardAndCreated, commentByPostAndCreated, listBoards } from './graphql/queries'
+import { createBoard, createPost, createComment } from './graphql/mutations'
 
 function AddPost(props) {
-    const [text, setText] = useState('');
+  const [text, setText] = useState('');
+  const addPost = async (content, boardId) => {
+    console.log('posting ' + content + boardId); 
+    const result = await API.graphql(graphqlOperation(createPost, {input: {
+      name: 'unknown',
+      content: content,
+      created: new Date().toISOString(),
+      boardId: boardId
+    }}));
+    console.log(result);
+    window.location.reload();    
+  }
+  
+  const onClickSubmit = (e, boardId) => {
+    console.log("boardId on click" + boardId);
+    addPost(text, boardId);
+    setText('');
+  };
 
-    const addPost = async (content) => {
-	console.log('posting ' + content);
-	const result = await API.graphql(graphqlOperation(createPost, {input: {
-	    name: 'unknown',
-	    content: content,
-	    created: new Date().toISOString(),
-	  type: 'post',
-	  boardId: props.boardId
-	}}));
-	console.log(result);
-	window.location.reload();    
-    }
-    
-    const onClickSubmit = (e) => {
-	console.log('onClick!');
-	addPost(text);
-	setText('');
-
-    };
-
-    const onChange = (e) => {
-	setText(e.target.value);
-    };
-    
-    return (
-	    <div className="AddPost">
-	    <input value={text} type="text" onChange={onChange}/>
-	    <button onClick={onClickSubmit}>
-	    submit!
-	</button>
-	    </div>
-    );
+  const onChange = (e) => {
+    setText(e.target.value);
+  };
+  
+  return (
+      <div className="AddPost"> <input value={text} type="text" onChange={onChange}/> <button onClick={(e) => onClickSubmit(e, props.boardId)}> submit! </button> </div>
+  );
 }
 
 function Post(props) {
@@ -46,126 +38,187 @@ function Post(props) {
   const toggleComment = (e) => {
     setCommentVisible(!commentVisible);
   };
-    
   
-    return (
-	    <div border="1px solid black" className="Post">
-	<p> {props.name} : {props.content} </p>
-	<button onClick={toggleComment}> toggle </button>	
-	{commentVisible &&
-	 <Comment key={props.id} postId={props.id}/>}
-	    </div>
-    );
+  
+  return (
+      <div border="1px solid black" className="Post">
+      <p> {props.name} : {props.content} </p>
+      <button onClick={toggleComment}> toggle </button>	
+      {commentVisible &&
+       <Comment key={props.id} postId={props.id}/>}
+    </div>
+  );
 }
 
 function AddComment(props) {
-    const [text, setText] = useState('');
-    const addComment = async (content) => {
-	console.log('commenting ' + content + props.postId);
-	
-	const result = await API.graphql(graphqlOperation(createComment, {input: {
-	    name: 'unknown',
-	    content: content,
-	    postId: props.postId,
-	    created: new Date().toISOString(),
-	}}));
-	console.log(result);
-	window.location.reload();
-    }
+  const [text, setText] = useState('');
+  const addComment = async (content) => {
+    console.log('commenting ' + content + props.postId);
     
-    const onClickSubmit = (e) => {
-	console.log('onClick!');
-	addComment(text);
-	setText('');
+    const result = await API.graphql(graphqlOperation(createComment, {input: {
+      name: 'unknown',
+      content: content,
+      postId: props.postId,
+      created: new Date().toISOString(),
+    }}));
+    console.log(result);
+    window.location.reload();
+  }
+  
+  const onClickSubmit = (e) => {
+    console.log('onClick!');
+    addComment(text);
+    setText('');
 
-    };
+  };
 
-    const onChange = (e) => {
-	setText(e.target.value);
-    };
-    
-    return (
-	    <div className="AddComment">
-	    <input value={text} type="text" onChange={onChange}/>
-	    <button onClick={onClickSubmit}>
-	    comment!
-	</button>
-	    </div>
-    );
+  const onChange = (e) => {
+    setText(e.target.value);
+  };
+  
+  return (
+      <div className="AddComment">
+      <input value={text} type="text" onChange={onChange}/>
+      <button onClick={onClickSubmit}>
+      comment!
+    </button>
+      </div>
+  );
 }
 
 
 function Comment(props) {
   const [commentList, setCommentList] = useState([]);
+  
+  useEffect(() => {
+    const getComments = async () => {
+      console.log('get comment post id : ' + props.postId);
+      const res = await API.graphql({query:commentByPostAndCreated, variables: {
+	postId: props.postId,
+	created: {lt: new Date().toISOString()},
+	sortDirection: 'DESC'
+      }});
+      
+      console.log(res);
+      const comments = res.data.commentByPostAndCreated.items
+      const list = comments.map(
+	(comment) => <p> {comment.content} </p>);
+      setCommentList(list);
+    };
     
-    useEffect(() => {
-	const getComments = async () => {
-	    console.log('get comment post id : ' + props.postId);
-	    const res = await API.graphql({query:commentByPostAndCreated, variables: {
-		postId: props.postId,
-		created: {lt: new Date().toISOString()},
-		sortDirection: 'DESC'
-	    }});
-	    
-	    console.log(res);
-	    const comments = res.data.commentByPostAndCreated.items
-	    const list = comments.map(
-		(comment) => <p> {comment.content} </p>);
-	    setCommentList(list);
-	};
-	
-	getComments();
-    }, []);
+    getComments();
+  }, [props]);
 
-    return (
-	<div className="Comment">
+  return (
+      <div className="Comment">
 
-	{commentList}
-	 <AddComment key={props.postId} postId={props.postId}/>
+    {commentList}
+      <AddComment key={props.postId} postId={props.postId}/>
       </div>
-    );
+  );
 }
 
 function Board(props) {
-  const [postList, setPostList] = useState([]);
-
+  const [state, setState] = useState({
+    boardId: '',
+    postList: []
+  });
   useEffect(() => {
-    const getPosts = async () => {
+    const getPosts = async (boardId) => {
+      if (!boardId) {
+	const res = await API.graphql({query:listBoards, variables: {}});
+	console.log(res);	    
+	const boards = res.data.listBoards.items;
+	if (boards.length > 0) {
+	  boardId = boards[0].id;
+	}
+      }
+      console.log("Board props" + boardId);
       const res = await API.graphql({query:postByBoardAndCreated, variables: {
-	boardId: props.id,
+	boardId: boardId,
 	created: {lt: new Date().toISOString()},
 	sortDirection: 'DESC'
       }});	    
       console.log(res);	    
-      const posts = res.data.postByTypeAndCreated.items
+      const posts = res.data.postByBoardAndCreated.items;
       const list = posts.map(
 	(post) => <Post key={post.id} id={post.id} name={post.name} content={post.content} />);
-      setPostList(list);
+      setState({boardId: boardId, postList: list});
     };
-    getPosts();
-  }, []);
+    getPosts(props.id);
+  }, [props]);
   
   return (
       <div className="App">
-      <AddPost boardId={props.id}/>	  
-      {postList}
+      <AddPost boardId={state.boardId}/>
+      {state.postList}
     </div>
   );
 }
 
 function BoardList(props) {
-  return (<div></div>);
+  const [boardList, setBoardList] = useState([]);
+
+  const onClickButton = (id, e) => {
+    console.log(id);
+    props.updateBoardId(id);
+  };
+
+  useEffect(() => {
+    const getBoards = async () => {
+      const res = await API.graphql({query:listBoards, variables: {
+      }});	    
+      console.log(res);	    
+      const boards = res.data.listBoards.items;
+      const list = boards.map(
+	(board) => <td key={board.id}> <button onClick={
+	  (e) => onClickButton(board.id, e)}>{board.name}</button> </td>);
+      setBoardList(list);
+    };
+    getBoards();
+  }, []);
+  
+  return (<div><table><tbody><tr>{boardList}</tr></tbody></table></div>);
 }
 
-function App() {
+function AddBoard() {
+  const [boardName, setBoardName] = useState([]);
+
+  const addBoard = async (name) => {
+    console.log('boarding ' + name);
+    const result = await API.graphql(graphqlOperation(createBoard, {input: {
+      name: name,
+      created: new Date().toISOString()
+    }}));
+    console.log(result);
+    window.location.reload();    
+  }
+  
+  const onClickSubmit = (e) => {
+    console.log('onClick!');
+    addBoard(boardName);
+    setBoardName('');
+  };
+
+  const onChange = (e) => {
+    setBoardName(e.target.value);
+  };
+
+  return (
+      <div className="AddBoard"> <input value={boardName} type="text" onChange={onChange}/> <button onClick={onClickSubmit}> create board! </button> </div>
+  );
+}
+
+function App(props) {
   const [boardId, setBoardId] = useState('');
   
   return (
       <div className="App">
-      <BoardList />
+      <AddBoard />
+      <BoardList updateBoardId={setBoardId} />
       <Board id={boardId}/>
       </div>
-    );
+  );
 }
 
 export default App;
