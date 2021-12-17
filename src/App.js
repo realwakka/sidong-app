@@ -3,6 +3,7 @@ import { API, graphqlOperation } from 'aws-amplify';
 import React, { useState, useEffect } from 'react';
 import { postByBoardAndCreated, commentByPostAndCreated, listBoards } from './graphql/queries'
 import { createBoard, createPost, createComment } from './graphql/mutations'
+import * as subscriptions from './graphql/subscriptions';
 
 function AddPost(props) {
   const [text, setText] = useState('');
@@ -66,7 +67,7 @@ function AddComment(props) {
       created: new Date().toISOString(),
     }}));
     console.log(result);
-    window.location.reload();
+    // window.location.reload();
   }
   
   const onClickSubmit = (e) => {
@@ -112,6 +113,13 @@ function Comment(props) {
     
     getComments();
   }, [props]);
+
+  const subscription = API.graphql(
+    graphqlOperation(subscriptions.onCreateComment)
+  ).subscribe({
+    next: ({ provider, value }) => console.log({ provider, value }),
+    error: error => console.warn(error)
+  });
 
   return (
       <div className="Comment">
