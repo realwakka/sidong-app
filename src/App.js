@@ -4,6 +4,11 @@ import React, { useState, useEffect } from 'react';
 import { postByBoardAndCreated, commentByPostAndCreated, listBoards } from './graphql/queries'
 import { createBoard, createPost, createComment } from './graphql/mutations'
 import * as subscriptions from './graphql/subscriptions';
+import { withAuthenticator } from '@aws-amplify/ui-react';
+import Amplify from "aws-amplify";
+import awsExports from "./aws-exports";
+
+Amplify.configure(awsExports);
 
 function AddPost(props) {
   const [text, setText] = useState('');
@@ -111,15 +116,22 @@ function Comment(props) {
       setCommentList(list);
     };
     
-    getComments();
+    // getComments();
+
+    
+    const subscribeComments = async () => {
+      const subscription = await API.graphql(
+	graphqlOperation(subscriptions.onCreateComment)
+      ).subscribe({
+	next: (data) => console.log(data),
+	error: error => console.warn(error)
+      });
+    };
+
+    subscribeComments();
+    
   }, [props]);
 
-  const subscription = API.graphql(
-    graphqlOperation(subscriptions.onCreateComment)
-  ).subscribe({
-    next: ({ provider, value }) => console.log({ provider, value }),
-    error: error => console.warn(error)
-  });
 
   return (
       <div className="Comment">
@@ -235,4 +247,4 @@ function App(props) {
   );
 }
 
-export default App;
+export default withAuthenticator(App);
