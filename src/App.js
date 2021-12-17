@@ -29,7 +29,7 @@ function AddPost(props) {
   };
   
   return (
-      <div className="AddPost"> <input value={text} type="text" onChange={onChange}/> <button onClick={(e) => onClickSubmit(e, props.boardId)}> submit! </button> </div>
+      <div className="AddPost"> <input value={text} type="text" onChange={onChange}/> <button onClick={(e) => onClickSubmit(e, props.boardId)}> post! </button> </div>
   );
 }
 
@@ -38,15 +38,19 @@ function Post(props) {
   const toggleComment = (e) => {
     setCommentVisible(!commentVisible);
   };
-  
-  
+
+  const buttonStyle = "height: 26px;";
   return (
-      <div border="1px solid black" className="Post">
+      <div>
+      <div className="Post">
       <p> {props.name} : {props.content} </p>
-      <button onClick={toggleComment}> toggle </button>	
+      <button onClick={toggleComment}> {commentVisible ? "close" : "open"} </button>
+      </div>
+      <div>
       {commentVisible &&
        <Comment key={props.id} postId={props.id}/>}
     </div>
+      </div>
   );
 }
 
@@ -149,7 +153,7 @@ function Board(props) {
   }, [props]);
   
   return (
-      <div className="App">
+      <div className="Board">
       <AddPost boardId={state.boardId}/>
       {state.postList}
     </div>
@@ -159,7 +163,7 @@ function Board(props) {
 function BoardList(props) {
   const [boardList, setBoardList] = useState([]);
 
-  const onClickButton = (id, e) => {
+  const onClickButton = (id, e, props) => {
     console.log(id);
     props.updateBoardId(id);
   };
@@ -172,13 +176,13 @@ function BoardList(props) {
       const boards = res.data.listBoards.items;
       const list = boards.map(
 	(board) => <td key={board.id}> <button onClick={
-	  (e) => onClickButton(board.id, e)}>{board.name}</button> </td>);
+	  (e) => onClickButton(board.id, e, props)}>{board.name}</button> </td>);
       setBoardList(list);
     };
     getBoards();
-  }, []);
+  }, [props]);
   
-  return (<div><table><tbody><tr>{boardList}</tr></tbody></table></div>);
+  return (<div className="BoardList"><table><tbody><tr>{boardList}</tr></tbody></table></div>);
 }
 
 function AddBoard() {
@@ -214,8 +218,10 @@ function App(props) {
   
   return (
       <div className="App">
+      <div>
       <AddBoard />
       <BoardList updateBoardId={setBoardId} />
+      </div>
       <Board id={boardId}/>
       </div>
   );
