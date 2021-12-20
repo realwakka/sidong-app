@@ -247,4 +247,4 @@ function App(props) {
   );
 }
 
-export default withAuthenticator(App);
+export default App;
