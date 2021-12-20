@@ -120,17 +120,22 @@ function Comment(props) {
 	graphqlOperation(subscriptions.onCreateComment)
       ).subscribe({
 	next: (data) => {
-	  const comment = data.value.onCreateComment;
+	  const comment = data.value.createComment;
 	  commentList.push("<p> " + comment.content + " </p>");
 	  setCommentList(commentList);
 	  console.log(data);
 	},
 	error: error => console.warn(error)
       });
-    };
 
-    subscribeComments();
+      return subscription;
+    };
     
+    const subscription = subscribeComments();
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, [props]);
 
 
