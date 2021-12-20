@@ -112,14 +112,19 @@ function Comment(props) {
       setCommentList(list);
     };
     
-    // getComments();
+    getComments();
 
     
     const subscribeComments = async () => {
       const subscription = await API.graphql(
 	graphqlOperation(subscriptions.onCreateComment)
       ).subscribe({
-	next: (data) => console.log(data),
+	next: (data) => {
+	  const comment = data.value.onCreateComment;
+	  commentList.push("<p> " + comment.content + " </p>");
+	  setCommentList(commentList);
+	  console.log(data);
+	},
 	error: error => console.warn(error)
       });
     };
