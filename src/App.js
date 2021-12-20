@@ -4,11 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { postByBoardAndCreated, commentByPostAndCreated, listBoards } from './graphql/queries'
 import { createBoard, createPost, createComment } from './graphql/mutations'
 import * as subscriptions from './graphql/subscriptions';
-import { withAuthenticator } from '@aws-amplify/ui-react';
-import Amplify from "aws-amplify";
-import awsExports from "./aws-exports";
-
-Amplify.configure(awsExports);
+// import { withAuthenticator } from '@aws-amplify/ui-react';
 
 function AddPost(props) {
   const [text, setText] = useState('');
