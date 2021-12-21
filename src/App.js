@@ -120,7 +120,7 @@ function Comment(props) {
 	graphqlOperation(subscriptions.onCreateComment)
       ).subscribe({
 	next: (data) => {
-	  const comment = data.value.createComment;
+	  const comment = data.createComment;
 	  commentList.push("<p> " + comment.content + " </p>");
 	  setCommentList(commentList);
 	  console.log(data);
